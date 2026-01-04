@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Training Log</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root {
+  --bg: #0f1115;
+  --card: #1a1d24;
+  --accent: #4ade80;
+  --text: #ffffff;
+  --muted: #9ca3af;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.exercise {
+  border-top: 1px solid #2a2d36;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.exercise:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.exercise h3 {
+  margin: 0 0 6px 0;
+}
+
+.badge {
+  display: inline-block;
+  background: #2a2d36;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.set-row span {
+  color: var(--muted);
+  font-size: 14px;
+  padding-top: 8px;
+}
+
+input {
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+  background: #0f1115;
+  color: var(--text);
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Compound + Calisthenics</h1>
+
+<div class="card" id="workout"></div>
+
+<button onclick="saveWorkout()">Save Session</button>
+
+<script>
+// List of exercises
+const exercises = [
+  "Weighted Pull-Ups",
+  "Weighted Dips",
+  "Squats",
+  "Deadlifts",
+  "Rows"
+];
+
+// Load saved data from localStorage
+let workoutData = JSON.parse(localStorage.getItem("workoutSession")) || {};
+
+// Function to render the workout inputs
+function loadWorkout() {
+  const container = document.getElementById("workout");
+  container.innerHTML = ""; // clear
+
+  exercises.forEach(ex => {
+    const sets = workoutData[ex] || ["","","",""]; // 4 sets
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `<h3>${ex}</h3>
+                     <div class="badge">4 sets • 6–8 reps</div>`;
+
+    ["Warm-up","Set 2","Set 3","Set 4"].forEach((label,i) => {
+      const row = document.createElement("div");
+      row.className = "set-row";
+      row.innerHTML = `<span>${label}</span>
+                       <input value="${sets[i]}" data-ex="${ex}" data-set="${i}">`;
+      div.appendChild(row);
+    });
+
+    container.appendChild(div);
+  });
+}
+
+// Save all current input values
+function saveWorkout() {
+  workoutData = {};
+  document.querySelectorAll(".set-row input").forEach(input => {
+    const ex = input.dataset.ex;
+    const set = parseInt(input.dataset.set);
+    if (!workoutData[ex]) workoutData[ex] = ["","","",""];
+    workoutData[ex][set] = input.value;
+  });
+
+  localStorage.setItem("workoutSession", JSON.stringify(workoutData));
+  alert("Workout saved!");
+}
+
+// Load on page load
+loadWorkout();
+</script>
+
+</body>
+</html>
